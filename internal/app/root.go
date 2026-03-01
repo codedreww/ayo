@@ -42,6 +42,11 @@ type rootModel struct {
 	unifiedList list.Model
 	archiveList list.Model
 
+	folderDelegate  list.DefaultDelegate
+	taskDelegate    list.DefaultDelegate
+	unifiedDelegate list.DefaultDelegate
+	archiveDelegate list.DefaultDelegate
+
 	status string
 	err error
 
@@ -53,7 +58,20 @@ func InitialModel() tea.Model{
 		archivePath: archiveFilePath(),
 		screen: screenFolderList,
 		status: "Welcome to Ayo! Use arrow keys to navigate, Enter to select, Press a to add a folder, and 'q' to quit.",
+		folderDelegate:  newFolderDelegate(),
+		taskDelegate:    newTaskDelegate(),
+		unifiedDelegate: newTaskDelegate(),
+		archiveDelegate: newTaskDelegate(),
 	}
+
+	m.folderList = newList(0, 0, m.folderDelegate)
+	m.folderList.Title = "Folders"
+	m.taskList = newList(0, 0, m.taskDelegate)
+	m.taskList.Title = "Tasks"
+	m.unifiedList = newList(0, 0, m.unifiedDelegate)
+	m.unifiedList.Title = "All Tasks"
+	m.archiveList = newList(0, 0, m.archiveDelegate)
+	m.archiveList.Title = "Archive"
 
 	if err := storage.Load(m.storagePath, &m.data); err != nil {
 		m.err = err
@@ -63,6 +81,12 @@ func InitialModel() tea.Model{
 		m.err = err
 		m.status = "Failed to load archive file."
 	}
+
+	normalizeData(&m.data)
+	normalizeData(&m.archiveData)
+	m.refreshFolderList("")
+	m.refreshUnifiedTaskList("", "")
+	m.refreshArchiveTaskList("", "")
 
 	if len(m.data.Folders) > 0 {
 		m.status = "Loaded folders from disk."

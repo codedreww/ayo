@@ -1,5 +1,15 @@
 package app
 
+const(
+	defaultFolderColor = "blue"
+	defaultPriority = 1
+
+	taskStateTodo = "todo"
+	taskStateMarked = "marked"
+	taskStateDone = "completed"
+	taskStateArchived = "archived"
+)
+
 type Task struct {
 	ID          string   `json:"id"`
 	Title       string   `json:"title"`
