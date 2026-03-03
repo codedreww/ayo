@@ -106,7 +106,7 @@ func (m rootModel) updateFolderListKeys(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		m.selectedFolderID = selected.folder.ID
 		m.refreshTaskListForFolder(selected.folder.ID, "")
-		m.screen = screenTasksList
+		m.screen = screenFolderTasks
 		m.status = ""
 		return m, nil
 	case key.Matches(msg, folderListKeys.Unified):
@@ -194,7 +194,7 @@ func (m *rootModel) syncFolderHoverStyle() {
 func (m rootModel) selectedFolderItem() (folderListItem, bool) {
 	selected := m.folderList.SelectedItem()
 	if selected == nil {
-		return folderListItem(), false
+		return folderListItem{}, false
 	}
 	it, ok := selected.(folderListItem)
 	return it, ok

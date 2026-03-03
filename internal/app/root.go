@@ -10,10 +10,12 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type screen int
+
 const (
 	screenFolderList screen = iota
 	screenFolderForm
-	screenTasksList
+	screenFolderTasks
 	screenTaskForm
 	screenUnifiedTasks
 	screenArchiveTasks
@@ -22,23 +24,23 @@ const (
 type rootModel struct {
 	storagePath string
 	archivePath string
-	
-	data AppData
+
+	data        AppData
 	archiveData AppData
 
 	screen screen
 
-	width int
+	width  int
 	height int
 
 	selectedFolderID string
 
-	folderForm folderFormModel
-	taskForm taskFormModel
+	folderForm           folderFormModel
+	taskForm             taskFormModel
 	taskFormReturnScreen screen
 
-	folderList list.Model
-	taskList list.Model
+	folderList  list.Model
+	taskList    list.Model
 	unifiedList list.Model
 	archiveList list.Model
 
@@ -48,16 +50,15 @@ type rootModel struct {
 	archiveDelegate list.DefaultDelegate
 
 	status string
-	err error
-
+	err    error
 }
 
-func InitialModel() tea.Model{
+func InitialModel() tea.Model {
 	m := rootModel{
-		storagePath: dataFilePath(),
-		archivePath: archiveFilePath(),
-		screen: screenFolderList,
-		status: "Welcome to Ayo! Use arrow keys to navigate, Enter to select, Press a to add a folder, and 'q' to quit.",
+		storagePath:     dataFilePath(),
+		archivePath:     archiveFilePath(),
+		screen:          screenFolderList,
+		status:          "Welcome to Ayo! Use arrow keys to navigate, Enter to select, Press a to add a folder, and 'q' to quit.",
 		folderDelegate:  newFolderDelegate(),
 		taskDelegate:    newTaskDelegate(),
 		unifiedDelegate: newTaskDelegate(),
@@ -92,14 +93,13 @@ func InitialModel() tea.Model{
 		m.status = "Loaded folders from disk."
 	}
 	return m
-}	
+}
 
-
-func (m rootModel) Init() tea.Cmd{
+func (m rootModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd){
+func (m rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.screen == screenFolderForm {
 		return m.updateFolderForm(msg)
 	}
@@ -117,8 +117,8 @@ func (m rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd){
 		switch m.screen {
 		case screenFolderList:
 			return m.updateFolderListKeys(msg)
-		case screenTasksList:
-			return m.updateTasksListKeys(msg)
+		case screenFolderTasks:
+			return m.updateFolderTaskKeys(msg)
 		case screenUnifiedTasks:
 			return m.updateUnifiedTaskKeys(msg)
 		case screenArchiveTasks:
@@ -129,14 +129,14 @@ func (m rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd){
 	return m, nil
 }
 
-func (m rootModel) View() string{
+func (m rootModel) View() string {
 	switch m.screen {
 	case screenFolderForm:
 		return m.folderForm.View()
 	case screenTaskForm:
 		return m.taskForm.View()
-	case screenTasksList:
-		return m.viewTasksList()
+	case screenFolderTasks:
+		return m.viewFolderTasks()
 	case screenUnifiedTasks:
 		return m.viewUnifiedTasks()
 	case screenArchiveTasks:
@@ -161,7 +161,6 @@ func (m *rootModel) resizeLists() {
 	m.archiveList.SetSize(w, h)
 }
 
-
 func dataFilePath() string {
 	if p := strings.TrimSpace(os.Getenv("AYO_DATA_PATH")); p != "" {
 		return p
@@ -175,4 +174,3 @@ func archiveFilePath() string {
 	}
 	return filepath.Join("data", "archive.json")
 }
-
