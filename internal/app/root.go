@@ -38,6 +38,7 @@ type rootModel struct {
 	folderForm           folderFormModel
 	taskForm             taskFormModel
 	taskFormReturnScreen screen
+	archiveReturnScreen  screen
 
 	folderList  list.Model
 	taskList    list.Model
@@ -55,14 +56,15 @@ type rootModel struct {
 
 func InitialModel() tea.Model {
 	m := rootModel{
-		storagePath:     dataFilePath(),
-		archivePath:     archiveFilePath(),
-		screen:          screenFolderList,
-		status:          "Welcome to Ayo! Use arrow keys to navigate, Enter to select, Press a to add a folder, and 'q' to quit.",
-		folderDelegate:  newFolderDelegate(),
-		taskDelegate:    newTaskDelegate(),
-		unifiedDelegate: newTaskDelegate(),
-		archiveDelegate: newTaskDelegate(),
+		storagePath:         dataFilePath(),
+		archivePath:         archiveFilePath(),
+		screen:              screenFolderList,
+		status:              "Welcome to Ayo! Use arrow keys to navigate, Enter to select, Press a to add a folder, and 'q' to quit.",
+		archiveReturnScreen: screenFolderList,
+		folderDelegate:      newFolderDelegate(),
+		taskDelegate:        newTaskDelegate(),
+		unifiedDelegate:     newTaskDelegate(),
+		archiveDelegate:     newArchiveDelegate(),
 	}
 
 	m.folderList = newList(0, 0, m.folderDelegate)

@@ -17,8 +17,8 @@ type taskListKeyMap struct {
 	Delete  key.Binding
 	Toggle  key.Binding
 	Mark    key.Binding
+	ViewArc key.Binding
 	Archive key.Binding
-	Restore key.Binding
 	Open    key.Binding
 	Up      key.Binding
 	Down    key.Binding
@@ -53,13 +53,13 @@ var taskListKeys = taskListKeyMap{
 		key.WithKeys("m"),
 		key.WithHelp("m", "toggle mark"),
 	),
+	ViewArc: key.NewBinding(
+		key.WithKeys("r"),
+		key.WithHelp("r", "archive view"),
+	),
 	Archive: key.NewBinding(
 		key.WithKeys("A"),
 		key.WithHelp("A", "archive done"),
-	),
-	Restore: key.NewBinding(
-		key.WithKeys("R"),
-		key.WithHelp("R", "restore archived"),
 	),
 	Open: key.NewBinding(
 		key.WithKeys("enter"),
@@ -165,6 +165,12 @@ func (m rootModel) updateFolderTaskKeys(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.refreshTaskListForFolder(m.selectedFolderID, "")
 		m.refreshUnifiedTaskList("", "")
 		m.refreshArchiveTaskList("", "")
+		return m, nil
+	case key.Matches(msg, taskListKeys.ViewArc):
+		m.refreshArchiveTaskList("", "")
+		m.archiveReturnScreen = screenFolderTasks
+		m.screen = screenArchiveTasks
+		m.status = ""
 		return m, nil
 	}
 	var cmd tea.Cmd

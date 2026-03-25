@@ -9,23 +9,23 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// This fiel defines bubbles/list item adapters and delegate setup
+// This field defines bubbles/list item adapters and delegate setup
 
 // for folder and tasks, including metadata shown under each row
 
-type folderListItem struct{
+type folderListItem struct {
 	folder Folder
 }
 
-func (i folderListItem) FilterValue() string{
+func (i folderListItem) FilterValue() string {
 	return strings.TrimSpace(i.folder.Name + " " + i.folder.Description)
 }
 
-func(i folderListItem) Title() string{
+func (i folderListItem) Title() string {
 	return i.folder.Name
 }
 
-func (i folderListItem) Description() string{
+func (i folderListItem) Description() string {
 	desc := strings.TrimSpace(i.folder.Description)
 	if desc == "" {
 		desc = "No Description"
@@ -34,17 +34,17 @@ func (i folderListItem) Description() string{
 
 }
 
-type taskListItem struct{
-	task Task
-	folderID string
+type taskListItem struct {
+	task       Task
+	folderID   string
 	folderName string
 }
 
-func (i taskListItem) FilterValue() string{
+func (i taskListItem) FilterValue() string {
 	return strings.TrimSpace(i.task.Title + " " + i.task.Description + " " + strings.Join(i.task.Tags, " ") + " " + i.folderName)
 }
 
-func (i taskListItem) Title() string{
+func (i taskListItem) Title() string {
 	state := i.task.State
 	if strings.TrimSpace(state) == "" {
 		state = taskStateTodo
@@ -52,31 +52,31 @@ func (i taskListItem) Title() string{
 	return fmt.Sprintf("%s %s", taskStateTag(state), i.task.Title)
 }
 
-func (i taskListItem) Description() string{
+func (i taskListItem) Description() string {
 	desc := strings.TrimSpace(i.task.Description)
-	if desc == ""{
+	if desc == "" {
 		desc = "(no description)"
 	}
 
 	chips := []string{priorityChip(i.task.Priority)}
-	if due := dueChip(i.task.DueDate); due != ""{
+	if due := dueChip(i.task.DueDate); due != "" {
 		chips = append(chips, due)
 	}
-	for _, tag := range i.task.Tags{
+	for _, tag := range i.task.Tags {
 		chips = append(chips, tagChip(tag))
 	}
-	if strings.TrimSpace(i.folderName) != ""{
+	if strings.TrimSpace(i.folderName) != "" {
 		chips = append(chips, folderChip(i.folderName))
 	}
 
 	chipLine := strings.Join(chips, " ")
-	if chipLine == ""{
+	if chipLine == "" {
 		return desc
 	}
 	return desc + "\n" + chipLine
 }
 
-func newList(width, height int, delegate list.DefaultDelegate) list.Model{
+func newList(width, height int, delegate list.DefaultDelegate) list.Model {
 	l := list.New([]list.Item{}, delegate, width, height)
 	l.SetShowStatusBar(true)
 	l.SetFilteringEnabled(true)
@@ -96,7 +96,7 @@ func newFolderDelegate() list.DefaultDelegate {
 	d.Styles.SelectedDesc = d.Styles.SelectedDesc.PaddingLeft(1)
 
 	d.ShortHelpFunc = func() []key.Binding {
-		return [] key.Binding{
+		return []key.Binding{
 			folderListKeys.Add,
 			folderListKeys.Edit,
 			folderListKeys.Delete,
@@ -104,17 +104,15 @@ func newFolderDelegate() list.DefaultDelegate {
 			folderListKeys.Unified,
 			folderListKeys.ViewArc,
 			folderListKeys.Archive,
-
 		}
 	}
 
 	d.FullHelpFunc = func() [][]key.Binding {
 		return [][]key.Binding{
-			{folderListKeys.Add, folderListKeys.Edit, folderListKeys.Delete, folderListKeys.Open}, 
-			{folderListKeys.Unified,folderListKeys.ViewArc,folderListKeys.Archive},
+			{folderListKeys.Add, folderListKeys.Edit, folderListKeys.Delete, folderListKeys.Open},
+			{folderListKeys.Unified, folderListKeys.ViewArc, folderListKeys.Archive},
 		}
 	}
-
 
 	return d
 }
@@ -129,15 +127,48 @@ func newTaskDelegate() list.DefaultDelegate {
 	d.Styles.SelectedDesc = d.Styles.SelectedDesc.PaddingLeft(1)
 
 	d.ShortHelpFunc = func() []key.Binding {
-		return [] key.Binding{
-			//TODO
-
+		return []key.Binding{
+			taskListKeys.Add,
+			taskListKeys.Edit,
+			taskListKeys.Delete,
+			taskListKeys.Toggle,
+			taskListKeys.Mark,
+			taskListKeys.Open,
+			taskListKeys.ViewArc,
+			taskListKeys.Archive,
 		}
 	}
 
 	d.FullHelpFunc = func() [][]key.Binding {
 		return [][]key.Binding{
-			//TODO
+			{taskListKeys.Add, taskListKeys.Edit, taskListKeys.Delete, taskListKeys.Toggle},
+			{taskListKeys.Mark, taskListKeys.Open, taskListKeys.ViewArc, taskListKeys.Archive},
+		}
+	}
+
+	return d
+}
+
+func newArchiveDelegate() list.DefaultDelegate {
+	d := list.NewDefaultDelegate()
+	d.SetHeight(3)
+	d.SetSpacing(1)
+	d.Styles.NormalTitle = d.Styles.NormalTitle.PaddingLeft(1)
+	d.Styles.NormalDesc = d.Styles.NormalDesc.PaddingLeft(1)
+	d.Styles.SelectedTitle = d.Styles.SelectedTitle.PaddingLeft(1)
+	d.Styles.SelectedDesc = d.Styles.SelectedDesc.PaddingLeft(1)
+
+	d.ShortHelpFunc = func() []key.Binding {
+		return []key.Binding{
+			archivedTaskListKeys.Delete,
+			archivedTaskListKeys.Restore,
+			archivedTaskListKeys.Open,
+		}
+	}
+
+	d.FullHelpFunc = func() [][]key.Binding {
+		return [][]key.Binding{
+			{archivedTaskListKeys.Delete, archivedTaskListKeys.Restore, archivedTaskListKeys.Open},
 		}
 	}
 

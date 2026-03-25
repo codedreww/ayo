@@ -116,6 +116,7 @@ func (m rootModel) updateFolderListKeys(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case key.Matches(msg, folderListKeys.ViewArc):
 		m.refreshArchiveTaskList("", "")
+		m.archiveReturnScreen = screenFolderList
 		m.screen = screenArchiveTasks
 		m.status = ""
 		return m, nil
