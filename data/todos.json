@@ -4,7 +4,17 @@
       "id": "folder_6c7c90b9",
       "name": "School",
       "description": "Everything related to school i guess",
-      "color": "orange"
+      "color": "orange",
+      "tasks": [
+        {
+          "id": "task_09b94ff5",
+          "title": "Work on 471",
+          "description": "work on the project",
+          "priority": 2,
+          "state": "todo",
+          "completed": false
+        }
+      ]
     }
   ]
 }

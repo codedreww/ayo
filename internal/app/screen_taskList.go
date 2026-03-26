@@ -143,7 +143,7 @@ func (m rootModel) updateFolderTaskKeys(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		next := taskStateMarked
-		if selected.task.State == taskStateDone {
+		if selected.task.State == taskStateMarked {
 			next = taskStateTodo
 		}
 		if !m.setTaskState(selected.folderID, selected.task.ID, next) {
